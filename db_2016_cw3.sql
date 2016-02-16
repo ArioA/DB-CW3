@@ -16,33 +16,28 @@ ORDER BY popularity DESC
 ;
 
 -- Q3 returns (house,seventeenth,eighteenth,nineteenth,twentieth)
-SELECT monarch.house, COUNT(	SELECT monarch.house
-				FROM monarch
-				WHERE accession <= 1700-12-31
-				AND accession >= 1601-01-01
-				) AS seventeenth,
-COUNT(	SELECT monarch.house
-	FROM monarch
-	WHERE accession <= 1800-12-31
-	AND accession >= 1701-01-01
-	) AS eighteenth,
-COUNT(	SELECT monarch.house
-	FORM monarch
-	WHERE accession <= 1900-12-31
-	AND accession >= 1801-01-01
-	) AS nineteenth,
-COUNT(	SELECT monarch.house
-	FROM monarch
-	WHERE accession <= 2000-12-31
-	AND accession >= 1901-01-01
-	) AS twentieth
+SELECT 	monarch.house, 
+	COUNT(CASE WHEN accession <= '1700-12-31'
+	AND accession >= '1601-01-01'
+	THEN monarch.name ELSE NULL END) AS seventeenth,
+	COUNT(CASE WHEN accession <= '1800-12-31'
+	AND accession >= '1701-01-01'
+	THEN monarch.name ELSE NULL END) AS eighteenth,
+	COUNT(CASE WHEN accession <= '1900-12-31'
+	AND accession >= '1801-01-01'
+	THEN monarch.name ELSE NULL END) AS nineteenth,
+	COUNT(CASE WHEN accession <= '2000-12-31'
+	AND accession >= '1901-01-01'
+	THEN monarch.name ELSE NULL END) AS twentieth
 FROM monarch
+WHERE monarch.house IS NOT NULL
 GROUP BY house
-ORDER BY house
+ORDER BY house ASC
 ; 
 
 -- Q4 returns (name,age)
-
+SELECT *
+FROM monarch
 ;
 
 -- Q5 returns (father,child,born)
