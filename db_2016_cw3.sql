@@ -50,8 +50,13 @@ AND 	child1.dob<=ALL	(SELECT dob
 
 -- Q5 returns (father,child,born)
 SELECT 	dad.name AS father, child.name AS child, 
-	RANK() OVER (PARTITION BY child.father ORDER BY child.dob) AS born
-FROM person AS dad JOIN person AS child ON dad.name = child.father
+	CASE WHEN child.name IS NULL THEN NULL
+	     ELSE RANK() OVER (PARTITION BY child.father ORDER BY child.dob) 
+	     END AS born
+FROM person AS dad LEFT JOIN person AS child 
+	ON dad.name = child.father
+WHERE dad.gender = 'M'
+ORDER BY father, born
 ;
 
 -- Q6 returns (monarch,prime_minister)
