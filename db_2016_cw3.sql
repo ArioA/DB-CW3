@@ -35,17 +35,26 @@ GROUP BY house
 ORDER BY house ASC
 ; 
 
+
 -- Q4 returns (name,age)
-
---Need a 'calculate_age' function, and union with mothers.
-
-SELECT 	parent.name
-FROM 	person AS child1, person AS parent 
-WHERE	child1.father = parent.name
+SELECT 	dad.name,
+	date_part('year', age(child1.dob, dad.dob)) AS age,
+FROM 	person AS child1, person AS dad
+WHERE	child1.father = dad.name
 AND 	child1.dob<=ALL	(SELECT dob
 			FROM person AS child2
-			WHERE child2.father = parent.name
+			WHERE child2.father = dad.name
 			)
+UNION
+SELECT 	mum.name,
+	date_part('year', age(child1.dob, mum.dob)) AS age,
+FROM 	person AS child1, person AS mum
+WHERE	child1.mother = mum.name
+AND 	child1.dob<=ALL (SELECT dob
+			FROM person AS child2
+			WHERE child2.mother = mum.name
+			)
+ORDER BY name
 ;
 
 -- Q5 returns (father,child,born)
