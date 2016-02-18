@@ -36,12 +36,22 @@ ORDER BY house ASC
 ; 
 
 -- Q4 returns (name,age)
-SELECT *
-FROM monarch
+
+--Need a 'calculate_age' function, and union with mothers.
+
+SELECT 	parent.name
+FROM 	person AS child1, person AS parent 
+WHERE	child1.father = parent.name
+AND 	child1.dob<=ALL	(SELECT dob
+			FROM person AS child2
+			WHERE child2.father = parent.name
+			)
 ;
 
 -- Q5 returns (father,child,born)
-
+SELECT 	dad.name AS father, child.name AS child, 
+	RANK() OVER (PARTITION BY child.father ORDER BY child.dob) AS born
+FROM person AS dad JOIN person AS child ON dad.name = child.father
 ;
 
 -- Q6 returns (monarch,prime_minister)
