@@ -38,7 +38,7 @@ ORDER BY house ASC
 
 -- Q4 returns (name,age)
 SELECT 	dad.name,
-	date_part('year', age(child1.dob, dad.dob)) AS age,
+	DATE_PART('year', AGE(child1.dob, dad.dob)) AS age
 FROM 	person AS child1, person AS dad
 WHERE	child1.father = dad.name
 AND 	child1.dob<=ALL	(SELECT dob
@@ -47,7 +47,7 @@ AND 	child1.dob<=ALL	(SELECT dob
 			)
 UNION
 SELECT 	mum.name,
-	date_part('year', age(child1.dob, mum.dob)) AS age,
+	DATE_PART('year', AGE(child1.dob, mum.dob)) AS age
 FROM 	person AS child1, person AS mum
 WHERE	child1.mother = mum.name
 AND 	child1.dob<=ALL (SELECT dob
@@ -70,5 +70,27 @@ ORDER BY father, born
 
 -- Q6 returns (monarch,prime_minister)
 
+CREATE TEMP TABLE pastPMs AS
+SELECT 	pm1.name AS prime_minister,
+	pm1.entry,
+	pm2.entry AS departure
+FROM 	prime_minister AS pm1, prime_minister AS pm2
+WHERE 	pm2.entry > pm1.entry
+AND 	pm2.entry<= ALL(SELECT pm3.entry
+			FROM prime_minister AS pm3
+			WHERE pm3.entry::DATE > pm1.entry::DATE
+			)
+ORDER BY pm1.entry DESC
 ;
 
+CREATE TEMP TABLE pastMons AS
+SELECT 	mon1.name AS monarch,
+	mon1.accession,
+	mon2.accession AS deccession
+FROM 	monarch AS mon1, monarch AS mon2
+WHERE 	mon2.accession > mon1.accession
+AND 	mon2.accession <= ALL(	SELECT mon3.accession
+				FROM monarch AS mon3
+				WHERE mon3.accession > mon1.accession
+				)
+ORDER BY mon1.accession DESC
