@@ -74,9 +74,9 @@ CREATE TEMP TABLE pastPMs AS
 SELECT 	pm1.name AS prime_minister,
 	pm1.entry,
 	pm2.entry AS departure
-FROM 	prime_minister AS pm1, prime_minister AS pm2
-WHERE 	pm2.entry > pm1.entry
-AND 	pm2.entry<= ALL(SELECT pm3.entry
+FROM 	prime_minister AS pm1 LEFT JOIN prime_minister AS pm2
+ON 	pm2.entry > pm1.entry
+WHERE 	pm2.entry<= ALL(SELECT pm3.entry
 			FROM prime_minister AS pm3
 			WHERE pm3.entry::DATE > pm1.entry::DATE
 			)
