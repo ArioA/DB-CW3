@@ -70,7 +70,7 @@ ORDER BY father, born
 
 -- Q6 returns (monarch,prime_minister)
 
-CREATE TEMP TABLE pastPMs AS
+--CREATE TEMP TABLE pastPMs AS
 SELECT 	pm1.name AS prime_minister,
 	pm1.entry,
 	pm2.entry AS departure
@@ -83,13 +83,13 @@ WHERE 	pm2.entry<= ALL(SELECT pm3.entry
 ORDER BY pm1.entry DESC
 ;
 
-CREATE TEMP TABLE pastMons AS
+--CREATE TEMP TABLE pastMons AS
 SELECT 	mon1.name AS monarch,
 	mon1.accession,
 	mon2.accession AS deccession
-FROM 	monarch AS mon1, monarch AS mon2
-WHERE 	mon2.accession > mon1.accession
-AND 	mon2.accession <= ALL(	SELECT mon3.accession
+FROM 	monarch AS mon1 LEFT JOIN monarch AS mon2
+ON 	mon2.accession > mon1.accession
+WHERE 	mon2.accession <= ALL(	SELECT mon3.accession
 				FROM monarch AS mon3
 				WHERE mon3.accession > mon1.accession
 				)
