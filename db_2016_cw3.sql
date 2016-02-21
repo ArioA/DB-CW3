@@ -70,8 +70,8 @@ ORDER BY father, born
 
 -- Q6 returns (monarch,prime_minister)
 
---CREATE TEMP TABLE pastPMs AS
-SELECT 	pm1.name AS prime_minister,
+CREATE TEMP TABLE primeMinisterNew AS
+SELECT 	pm1.name AS name,
 	pm1.entry,
 	pm2.entry AS departure
 FROM 	prime_minister AS pm1 LEFT JOIN prime_minister AS pm2
@@ -83,8 +83,8 @@ WHERE 	pm2.entry<= ALL(SELECT pm3.entry
 ORDER BY pm1.entry DESC
 ;
 
---CREATE TEMP TABLE pastMons AS
-SELECT 	mon1.name AS monarch,
+CREATE TEMP TABLE monarchNew AS
+SELECT 	mon1.name AS name,
 	mon1.accession,
 	mon2.accession AS deccession
 FROM 	monarch AS mon1 LEFT JOIN monarch AS mon2
@@ -94,3 +94,25 @@ WHERE 	mon2.accession <= ALL(	SELECT mon3.accession
 				WHERE mon3.accession > mon1.accession
 				)
 ORDER BY mon1.accession DESC
+;
+
+SELECT 	monarch.name AS monarch, 
+	CASE 
+		WHEN monarch.deccession IS NULL
+		AND monarch.accession::DATE < pm.entry::DATE
+		THEN pm.name
+		WHEN pm.entry::DATE > monarch.accession::DATE
+		AND pm.entry::DATE < monarch.deccession::DATE
+		THEN pm.name
+		WHEN pm.departure::DATE > monarch.accession::DATE
+		AND pm.departure::DATE > monarch.accession::DATE
+		THEN pm.name
+		WHEN monarch.accession::DATE < pm.entry::DATE
+		AND monarch.deccession::DATE > pm.departure::DATE
+		THEN pm.name
+		WHEN pm.entry::DATE < monarch.accession::DATE
+		AND pm.departure::DATE > monarch.deccession::DATE
+		THEN pm.name
+		ELSE NULL END AS prime_minister
+FROM 	monarchNew AS monarch, primeMinisterNew AS pm
+;
