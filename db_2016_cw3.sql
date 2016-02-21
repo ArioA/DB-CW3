@@ -96,23 +96,20 @@ WHERE 	mon2.accession <= ALL(	SELECT mon3.accession
 ORDER BY mon1.accession DESC
 ;
 
-SELECT 	monarch.name AS monarch, 
-	CASE 
-		WHEN monarch.deccession IS NULL
-		AND monarch.accession::DATE < pm.entry::DATE
-		THEN pm.name
-		WHEN pm.entry::DATE > monarch.accession::DATE
-		AND pm.entry::DATE < monarch.deccession::DATE
-		THEN pm.name
-		WHEN pm.departure::DATE > monarch.accession::DATE
-		AND pm.departure::DATE > monarch.accession::DATE
-		THEN pm.name
-		WHEN monarch.accession::DATE < pm.entry::DATE
-		AND monarch.deccession::DATE > pm.departure::DATE
-		THEN pm.name
-		WHEN pm.entry::DATE < monarch.accession::DATE
-		AND pm.departure::DATE > monarch.deccession::DATE
-		THEN pm.name
-		ELSE NULL END AS prime_minister
+SELECT 	DISTINCT monarch.name AS monarch, 
+	pm.name AS prime_minister
 FROM 	monarchNew AS monarch, primeMinisterNew AS pm
+WHERE 	(monarch.deccession IS NULL
+	AND monarch.accession::DATE < pm.entry::DATE)
+OR	(monarch.deccession IS NULL
+	AND monarch.accession::DATE < pm.departure::DATE)
+OR 	(pm.entry::DATE > monarch.accession::DATE
+	AND pm.entry::DATE < monarch.deccession::DATE)
+OR	(pm.departure::DATE > monarch.accession::DATE
+	AND pm.departure::DATE < monarch.deccession::DATE)
+OR	(monarch.accession::DATE < pm.entry::DATE
+	AND monarch.deccession::DATE > pm.departure::DATE)
+OR	(pm.entry::DATE < monarch.accession::DATE
+	AND pm.departure::DATE > monarch.deccession::DATE)
+ORDER BY monarch.name, pm.name
 ;
