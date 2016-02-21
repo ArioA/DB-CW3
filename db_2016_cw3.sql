@@ -1,8 +1,9 @@
 -- Q1 returns (first_name)
 SELECT	CASE
 	WHEN POSITION(' ' IN person.name) = 0
-	THEN person.name
-	ELSE SUBSTRING(person.name FROM 1 FOR (POSITION(' ' IN person.name) -1))
+		THEN person.name
+	ELSE 
+		SUBSTRING(person.name FROM 1 FOR (POSITION(' ' IN person.name) -1))
 	END AS first_name
 FROM person
 ORDER BY first_name ASC
@@ -12,7 +13,7 @@ ORDER BY first_name ASC
 SELECT person.born_in, COUNT(person.born_in) AS popularity
 FROM person
 GROUP BY person.born_in
-ORDER BY popularity DESC
+ORDER BY popularity, born_in DESC
 ;
 
 -- Q3 returns (house,seventeenth,eighteenth,nineteenth,twentieth)
@@ -39,18 +40,16 @@ ORDER BY house ASC
 -- Q4 returns (name,age)
 SELECT 	dad.name,
 	DATE_PART('year', AGE(child1.dob, dad.dob)) AS age
-FROM 	person AS child1, person AS dad
-WHERE	child1.father = dad.name
-AND 	child1.dob<=ALL	(SELECT dob
+FROM 	person AS child1 JOIN person AS dad ON child1.father = dad.name
+WHERE 	child1.dob<=ALL	(SELECT dob
 			FROM person AS child2
 			WHERE child2.father = dad.name
 			)
 UNION
 SELECT 	mum.name,
 	DATE_PART('year', AGE(child1.dob, mum.dob)) AS age
-FROM 	person AS child1, person AS mum
-WHERE	child1.mother = mum.name
-AND 	child1.dob<=ALL (SELECT dob
+FROM 	person AS child1 JOIN person AS mum ON child1.mother = mum.name
+WHERE 	child1.dob<=ALL (SELECT dob
 			FROM person AS child2
 			WHERE child2.mother = mum.name
 			)
